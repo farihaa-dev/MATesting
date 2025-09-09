@@ -53,8 +53,8 @@
     const AMOUNT = '100.00';
 
     async function initClickToPay() {
-      if (!window.SRC) {
-        throw new Error('SRC SDK not loaded. Check script URL and network.');
+      if (!window.click2pay) {
+        throw new Error('ClickToPay SDK not loaded. Check script URL.');
       }
       // Some setups use dpaId; others srcInitiatorId. Use the one assigned to you.
       const initOptions = {
@@ -64,9 +64,9 @@
         countryCode: MERCHANT_COUNTRY,
         displayMode: 'native' // or 'lightbox' depending on your UX
       };
-      log('Calling SRC.init', initOptions);
-      await window.SRC.init(initOptions);
-      log('SRC.init done');
+      log('Calling click2pay.init', initOptions);
+      await window.click2pay.init(initOptions);
+      log('ClickToPay.init done');
     }
 
     async function runClickToPay() {
@@ -81,15 +81,15 @@
 
         // 1) Check if consumer is recognized
         log('Calling SRC.isRecognized', { email });
-        const recognized = await window.SRC.isRecognized({
+        const recognized = await window.click2pay.isRecognized({
           consumer: { emailAddress: email }
         });
         log('isRecognized response', recognized);
 
         // 2) If not recognized, identify consumer (may send OTP/password)
         if (!recognized || recognized.consumerRecognized !== true) {
-          log('Calling SRC.identify');
-          await window.SRC.identify({
+          log('Calling click2pay.identify');
+          await window.click2pay.identify({
             consumer: { emailAddress: email }
           });
           log('SRC.identify done');
@@ -103,7 +103,7 @@
         };
 
         log('Calling SRC.checkout', paymentRequest);
-        const result = await window.SRC.checkout({
+        const result = await window.click2pay.checkout({
           windowRef: window,     // or a popup; SDK decides the UI
           paymentRequest
         });
