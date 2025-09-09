@@ -6,6 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Mastercard Click to Pay (Sandbox) -->
   <script src="https://sandbox.src.mastercard.com/srci/srci.js"></script>
+
+
+    <!--Adding required scripts for SRC Button-->
+  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+<link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
+
+  
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; }
     .row { margin: 12px 0; }
@@ -40,10 +47,10 @@
     }
 
     // Replace these with YOUR sandbox config
-    const DPA_ID = 'YOUR_DPA_ID_OR_SRC_INITIATOR_ID';
-    const MERCHANT_COUNTRY = 'US'; // your merchant country
-    const CURRENCY = 'USD';
-    const AMOUNT = '12.34';
+    const DPA_ID = '576094b8-e60d-48c7-babe-0a1e0611b37e';
+    const MERCHANT_COUNTRY = 'AU'; // your merchant country
+    const CURRENCY = 'AUD';
+    const AMOUNT = '100.00';
 
     async function initClickToPay() {
       if (!window.SRC) {
