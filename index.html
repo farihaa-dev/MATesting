@@ -32,7 +32,7 @@
 
       checkoutButton.addEventListener("click", function () {
         //Check if the Mastercard SDK's init() function is available
-        if (typeof init === "function") {
+
           init({
     "srcDpaId": "576094b8-e60d-48c7-babe-0a1e0611b37e", // required
     "checkoutExperience":"WITHIN_CHECKOUT",
@@ -76,9 +76,7 @@
     ],
 }
 ); // This is calling Mastercard’s init()
-        } else {
-          console.error("Mastercard init() function is not available.");
-        }
+        
       });
     });
   </script>
