@@ -23,5 +23,20 @@
   
     <button onclick="init()">Checkout</button>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const checkoutButton = document.getElementById("checkout-btn");
+
+      checkoutButton.addEventListener("click", function () {
+        //Check if the Mastercard SDK's init() function is available
+        if (typeof init === "function") {
+          init(); // This is calling Mastercard’s init()
+        } else {
+          console.error("Mastercard init() function is not available.");
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>
