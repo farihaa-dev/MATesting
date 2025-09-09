@@ -1,9 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
+
   <meta charset="utf-8" />
   <title>Mastercard Click to Pay - Minimal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+     <!-- Adding Content Security Policy   -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://sandbox.src.mastercard.com; object-src 'none'; base-uri 'self';">
+
   <!-- Mastercard Click to Pay (Sandbox) -->
  <script src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
 
