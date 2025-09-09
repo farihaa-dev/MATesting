@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mastercard Click to Pay - Minimal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Mastercard Click to Pay (Sandbox) -->
+  <script src="https://sandbox.src.mastercard.com/srci/srci.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px; }
+    .row { margin: 12px 0; }
+    button { padding: 10px 16px; font-size: 16px; }
+    pre { background: #f6f8fa; padding: 12px; overflow: auto; }
+    input { padding: 8px; font-size: 16px; width: 280px; }
+  </style>
+</head>
+<body>
+  <h1>Mastercard Click to Pay (Sandbox)</h1>
+
+  <div class="row">
+    <label for="email">Consumer email (sandbox profile):</label><br />
+    <input id="email" type="email" placeholder="consumer@example.com" />
+  </div>
+
+  <div class="row">
+    <button id="ctpButton" type="button">Click to Pay</button>
+  </div>
+
+  <div class="row">
+    <strong>Logs</strong>
+    <pre id="log"></pre>
+  </div>
+
+  <script>
+    const logEl = document.getElementById('log');
+    function log(msg, data) {
+      const line = typeof data === 'undefined' ? msg : msg + ' ' + JSON.stringify(data, null, 2);
+      logEl.textContent += line + '\n';
+      console.log(msg, data);
+    }
+
+    // Replace these with YOUR sandbox config
+    const DPA_ID = 'YOUR_DPA_ID_OR_SRC_INITIATOR_ID';
+    const MERCHANT_COUNTRY = 'US'; // your merchant country
+    const CURRENCY = 'USD';
+    const AMOUNT = '12.34';
+
+    async function initClickToPay() {
+      if (!window.SRC) {
+        throw new Error('SRC SDK not loaded. Check script URL and network.');
+      }
+      // Some setups use dpaId; others srcInitiatorId. Use the one assigned to you.
+      const initOptions = {
+        dpaId: DPA_ID,
+        dpaTransactionId: crypto.randomUUID(), // a unique ID per transaction
+        cardBrands: ['mastercard', 'visa', 'amex', 'discover'],
+        countryCode: MERCHANT_COUNTRY,
+        displayMode: 'native' // or 'lightbox' depending on your UX
+      };
+      log('Calling SRC.init', initOptions);
+      await window.SRC.init(initOptions);
+      log('SRC.init done');
+    }
+
+    async function runClickToPay() {
+      try {
+        await initClickToPay();
+
+        const email = document.getElementById('email').value.trim();
+        if (!email) {
+          alert('Enter a sandbox consumer email that has Click to Pay set up.');
+          return;
+        }
+
+        // 1) Check if consumer is recognized
+        log('Calling SRC.isRecognized', { email });
+        const recognized = await window.SRC.isRecognized({
+          consumer: { emailAddress: email }
+        });
+        log('isRecognized response', recognized);
+
+        // 2) If not recognized, identify consumer (may send OTP/password)
+        if (!recognized || recognized.consumerRecognized !== true) {
+          log('Calling SRC.identify');
+          await window.SRC.identify({
+            consumer: { emailAddress: email }
+          });
+          log('SRC.identify done');
+        }
+
+        // 3) Start checkout flow. You can let SDK prompt card selection.
+        const paymentRequest = {
+          amount: AMOUNT,
+          currencyCode: CURRENCY,
+          countryCode: MERCHANT_COUNTRY
+        };
+
+        log('Calling SRC.checkout', paymentRequest);
+        const result = await window.SRC.checkout({
+          windowRef: window,     // or a popup; SDK decides the UI
+          paymentRequest
+        });
+
+        // 4) Send result/token/cryptogram to your server to authorize
+        log('Checkout result', result);
+      } catch (err) {
+        log('Error', { message: err?.message || String(err) });
+        alert('Click to Pay error: ' + (err?.message || String(err)));
+      }
+    }
+
+    document.getElementById('ctpButton').addEventListener('click', runClickToPay);
+  </script>
+</body>
+</html>
