@@ -30,7 +30,49 @@
       checkoutButton.addEventListener("click", function () {
         //Check if the Mastercard SDK's init() function is available
         if (typeof init === "function") {
-          init(); // This is calling Mastercard’s init()
+          init(
+  "srciTransactionId":"781eaff9-f72e-4365-a438-0e4c82c8ded4",
+  "srcInitiatorId":"5e0d4b84-189d-4c86-822d-590602f62062",
+  "srciDpaId":"7a96bc0a-1a1e-4c62-996e-2153e3302291_systemtest",
+
+  "dpaTransactionOptions":
+  {
+      "transactionAmount":
+      {
+          "transactionAmount":"100.00",
+          "transactionCurrencyCode":"USD"
+      },
+      "transactionType": "PURCHASE",
+      "dpaBillingPreference":"FULL",
+      "dpaShippingPreference":"FULL",
+      "customInputData":
+        {
+          "com.mastercard.dcfExperience":"WITHIN_CHECKOUT"
+        },
+      "consumerNationalIdentifierRequested":false,
+      "dpaAcceptedBillingCountries":
+        [
+        ],
+      "dpaAcceptedShippingCountries":
+        [
+        ],
+      "dpaLocale":"en_US",
+      "consumerEmailAddressRequested":true,
+      "consumerNameRequested":true,
+      "consumerPhoneNumberRequested":true,
+      "confirmPayment":false,
+      "payloadTypeIndicatorCheckout":"PAYMENT",
+      "payloadTypeIndicatorPayload":"PAYMENT",
+      "paymentOptions":
+        [
+          {
+              "dpaDynamicDataTtlMinutes":15,
+              "dpaPanRequested":false,
+              "dynamicDataType":"CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM"
+          }
+       ]
+  }
+}); // This is calling Mastercard’s init()
         } else {
           console.error("Mastercard init() function is not available.");
         }
