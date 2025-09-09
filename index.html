@@ -10,6 +10,10 @@
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://sandbox.src.mastercard.com; object-src 'none'; base-uri 'self';">
   -->
 
+  <!--Adding required scripts for SRC Button-->
+  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+<link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
+
   <!-- Adding JS -->
   <script src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
 
@@ -20,9 +24,8 @@
 
     <h1>Checkout</h1>
 
-  
-    <button id="checkout-btn">Checkout</button>
-
+    <src-button id="checkout-btn"></src-button>
+    
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const checkoutButton = document.getElementById("checkout-btn");
@@ -31,48 +34,48 @@
         //Check if the Mastercard SDK's init() function is available
         if (typeof init === "function") {
           init({
-  "srciTransactionId":"781eaff9-f72e-4365-a438-0e4c82c8ded4",
-  "srcInitiatorId":"5e0d4b84-189d-4c86-822d-590602f62062",
-  "srciDpaId":"7a96bc0a-1a1e-4c62-996e-2153e3302291_systemtest",
-
-  "dpaTransactionOptions":
-  {
-      "transactionAmount":
-      {
-          "transactionAmount":"100.00",
-          "transactionCurrencyCode":"USD"
-      },
-      "transactionType": "PURCHASE",
-      "dpaBillingPreference":"FULL",
-      "dpaShippingPreference":"FULL",
-      "customInputData":
+    "srcDpaId": "576094b8-e60d-48c7-babe-0a1e0611b37e", // required
+    "checkoutExperience":"WITHIN_CHECKOUT",
+    "recognitionToken":"eyJraWQiOiIyMDIzMDIwODA4NTE1Ny1zYW5kYm94LWlkZW50aXR5LXZlcmlmaWNhdGlvbi1zcmMtbWFzdGVyY2FyZC1pbnQiLCJ0eXAiOiJKV1QrZXh0LnJlY29nbml0aW9uX3Rva2VuIiwiYWxnIjoiUlMyNTYifQ.eyJhcHBJbnN0YW5jZUlkIjoiNTM4MzI1NDEtYjNhZS00ZTZmLTliOWEtNjQ0MTI4MjU3YjBkIiwiYXVkIjoiaHR0cHM6XC9cL21hc3RlcmNhcmQuY29tIiwiY29uc3VtZXJJZCI6IjRlZGM4NmVjLTcxMjctNDVlMy1iNDgwLTk2NTAzYTFmZjUzZSIsInNyY2lDbGllbnRJZCI6IjU0NGVmODFhLWRhZTAtNGYyNi05NTExLWJmYmRiYTNkNjJiNSIsImlzcyI6Imh0dHBzOlwvXC9tYXN0ZXJjYXJkLmNvbSIsInNjb3BlcyI6WyJERUZBVUxUIl0sImV4cCI6MTczMjU0NDM0OCwiaWF0IjoxNzE2OTkyMzQ4LCJqdGkiOiIzY2ViNWY2OS04N2QxLTQ4NjUtYjk5YS01Zjg5ZGViYjc5Y2YiLCJwcm9ncmFtSWQiOiJTUkMifQ.P3HU06D7lL2J4FkHCgBk7EmFceSZG9yYK7h_LAa9cXOFPBGylSxO5kTvo9ehNqaRp-nFDO9qu72WsmRmog5JK8Fw204YpRP-8Tr9HW9AQ7SbV-896O-uYM0-ViWvYfPDDEpozij46uv4P1qXNe95uJLmFUGrgsyZXfD66HCrE7FNzvnFMiEezhJ5zWKM_HIGE2Zn31-_uFsOIjNw0rOjcIufjIIYGrWe8RDzfUdEweM04BBbpzuwDBvFSJaGM63zq-JJQ0duCTptlRIq9SYUqEjjZnEgf58ZxOh4eTCzc-6EP97-W0RuNHEGNPjd9ZGNAwVQAJbGbXoltONmnobM5Q",
+    "dpaData": { // required
+        "dpaName": "Registered DPA Name"
+    },
+    "dpaTransactionOptions": {
+      "consumerEmailAddressRequested": true,
+      "consumerPhoneNumberRequested": true,
+      "dpaBillingPreference": "FULL",
+      "dpaLocale": "en_US",
+      "paymentOptions": [
         {
-          "com.mastercard.dcfExperience":"WITHIN_CHECKOUT"
+          "dynamicDataType": "CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM"
+        }
+      ],
+      "transactionAmount": {
+        "transactionAmount": "100",
+        "transactionCurrencyCode": "USD"
+      },
+      "acquirerData": [
+        {
+          "cardBrand" : "mastercard",
+          "acquirerMerchantId" : "SRC3DS",
+          "acquirerBIN": "545301"
         },
-      "consumerNationalIdentifierRequested":false,
-      "dpaAcceptedBillingCountries":
-        [
-        ],
-      "dpaAcceptedShippingCountries":
-        [
-        ],
-      "dpaLocale":"en_US",
-      "consumerEmailAddressRequested":true,
-      "consumerNameRequested":true,
-      "consumerPhoneNumberRequested":true,
-      "confirmPayment":false,
-      "payloadTypeIndicatorCheckout":"PAYMENT",
-      "payloadTypeIndicatorPayload":"PAYMENT",
-      "paymentOptions":
-        [
-          {
-              "dpaDynamicDataTtlMinutes":15,
-              "dpaPanRequested":false,
-              "dynamicDataType":"CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM"
-          }
-       ]
-  }
-}); // This is calling Mastercard’s init()
+       {
+        "cardBrand": "visa",
+        "acquirerMerchantId": "33334444",
+        "acquirerBIN": "432104"
+        }
+      ]
+    },
+    "cardBrands": [ // required
+        "mastercard",
+        "maestro",
+        "visa",
+        "amex",
+        "discover"
+    ],
+}
+); // This is calling Mastercard’s init()
         } else {
           console.error("Mastercard init() function is not available.");
         }
