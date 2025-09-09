@@ -28,35 +28,45 @@
   
   <script>
 
+checkoutButton.addEventListener("click", function () {        
+  //Check if the Mastercard SDK's init() function is available        
+  if (typeof init === "function") {          
+  // This is calling Mastercard’s init()         
+    init( 
+    "srciTransactionId":"781eaff9-f72e-4365-a438-0e4c82c8ded4",  
+      "srcInitiatorId":"5e0d4b84-189d-4c86-822d-590602f62062",  
+      "srciDpaId":"7a96bc0a-1a1e-4c62-996e-2153e3302291_systemtest",  
+      "dpaTransactionOptions":  {     
+          "transactionAmount":      {         
+            "transactionAmount":"100.00",         
+            "transactionCurrencyCode":"USD"     
+                                    },     
+          "transactionType": "PURCHASE",      
+          "dpaBillingPreference":"FULL",      
+          "dpaShippingPreference":"FULL",      
+          "customInputData":       {          
+              "com.mastercard.dcfExperience":"WITHIN_CHECKOUT"        
+                                    },      
+      "consumerNationalIdentifierRequested":false,      
+      "dpaAcceptedBillingCountries":        [        ],      
+      "dpaAcceptedShippingCountries":        [        ],     
+      "dpaLocale":"en_US",      
+      "consumerEmailAddressRequested":true,      
+      "consumerNameRequested":true,     
+      "consumerPhoneNumberRequested":true,      
+      "confirmPayment":false,      
+      "payloadTypeIndicatorCheckout":"PAYMENT",      
+      "payloadTypeIndicatorPayload":"PAYMENT",      
+      "paymentOptions":        [          {              
+        "dpaDynamicDataTtlMinutes":15,              
+        "dpaPanRequested":false,              
+        "dynamicDataType":"CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM"          }       ]  }}); // This is calling Mastercard’s init()        
+    }
+                                else {          console.error("Mastercard init() function is not available.");        }
+
     
-  var params = {
-    srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e", // required DPA Identifier, generated during registration.
-    dpaData: {
-     dpaName: "DPA Name"       //required
-    },
-    dpaTransactionOptions: {
-     dpaLocale: "en_AU",      // required
-    },
-    cardBrands: ["mastercard"]  // required. Array of card brands supported.
-  }
-  var mcCheckoutService = new MastercardCheckoutServices()
 
-  async function initializeMastercardCheckoutServices() {
-    try {
-     var result = await mcCheckoutService.init(params)     
-     // handle result: an object containing a list of initialized card networks
-     // upon successful resolution, other methods, e.g. getCards(), may be called
-    } 
-     catch (error) {
-      // handle error
-     }
-  }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const button = document.getElementById("checkout-button");
-              initializeMastercardCheckoutServices()
-      });
-</script>
+  </script>
 Back
 
 
