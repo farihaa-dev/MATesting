@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
 
   <!-- Adding JS -->
-  <script src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
+  <script src="https://sandbox.src.mastercard.com/srci/integration/2/lib.js?srcDpaId="576094b8-e60d-48c7-babe-0a1e0611b37e"&locale="en_AU""> </script>
 
 
 
@@ -25,61 +25,41 @@
     <h1>Checkout</h1>
 
     <src-button id="checkout-btn"></src-button>
-    
+
+  
   <script>
+
+    
+  var params = {
+    srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e", // required DPA Identifier, generated during registration.
+    dpaData: {
+     dpaName: "DPA Name"       //required
+    },
+    dpaTransactionOptions: {
+     dpaLocale: "en_AU",      // required
+    },
+    cardBrands: ["mastercard"]  // required. Array of card brands supported.
+  }
+  var mcCheckoutService = new MastercardCheckoutServices()
+
+  async function initializeMastercardCheckoutServices() {
+    try {
+     var result = await mcCheckoutService.init(params)     
+     // handle result: an object containing a list of initialized card networks
+     // upon successful resolution, other methods, e.g. getCards(), may be called
+    } 
+     catch (error) {
+      // handle error
+     }
+  }
+
     document.addEventListener("DOMContentLoaded", function () {
-      const checkoutButton = document.getElementById("checkout-btn");
-
-      checkoutButton.addEventListener("click", function () {
-        //Check if the Mastercard SDK's init() function is available
-
-          init({
-    "srcDpaId": "576094b8-e60d-48c7-babe-0a1e0611b37e", // required
-    "checkoutExperience":"WITHIN_CHECKOUT",
-    "recognitionToken":"eyJraWQiOiIyMDIzMDIwODA4NTE1Ny1zYW5kYm94LWlkZW50aXR5LXZlcmlmaWNhdGlvbi1zcmMtbWFzdGVyY2FyZC1pbnQiLCJ0eXAiOiJKV1QrZXh0LnJlY29nbml0aW9uX3Rva2VuIiwiYWxnIjoiUlMyNTYifQ.eyJhcHBJbnN0YW5jZUlkIjoiNTM4MzI1NDEtYjNhZS00ZTZmLTliOWEtNjQ0MTI4MjU3YjBkIiwiYXVkIjoiaHR0cHM6XC9cL21hc3RlcmNhcmQuY29tIiwiY29uc3VtZXJJZCI6IjRlZGM4NmVjLTcxMjctNDVlMy1iNDgwLTk2NTAzYTFmZjUzZSIsInNyY2lDbGllbnRJZCI6IjU0NGVmODFhLWRhZTAtNGYyNi05NTExLWJmYmRiYTNkNjJiNSIsImlzcyI6Imh0dHBzOlwvXC9tYXN0ZXJjYXJkLmNvbSIsInNjb3BlcyI6WyJERUZBVUxUIl0sImV4cCI6MTczMjU0NDM0OCwiaWF0IjoxNzE2OTkyMzQ4LCJqdGkiOiIzY2ViNWY2OS04N2QxLTQ4NjUtYjk5YS01Zjg5ZGViYjc5Y2YiLCJwcm9ncmFtSWQiOiJTUkMifQ.P3HU06D7lL2J4FkHCgBk7EmFceSZG9yYK7h_LAa9cXOFPBGylSxO5kTvo9ehNqaRp-nFDO9qu72WsmRmog5JK8Fw204YpRP-8Tr9HW9AQ7SbV-896O-uYM0-ViWvYfPDDEpozij46uv4P1qXNe95uJLmFUGrgsyZXfD66HCrE7FNzvnFMiEezhJ5zWKM_HIGE2Zn31-_uFsOIjNw0rOjcIufjIIYGrWe8RDzfUdEweM04BBbpzuwDBvFSJaGM63zq-JJQ0duCTptlRIq9SYUqEjjZnEgf58ZxOh4eTCzc-6EP97-W0RuNHEGNPjd9ZGNAwVQAJbGbXoltONmnobM5Q",
-    "dpaData": { // required
-        "dpaName": "Registered DPA Name"
-    },
-    "dpaTransactionOptions": {
-      "consumerEmailAddressRequested": true,
-      "consumerPhoneNumberRequested": true,
-      "dpaBillingPreference": "FULL",
-      "dpaLocale": "en_US",
-      "paymentOptions": [
-        {
-          "dynamicDataType": "CARD_APPLICATION_CRYPTOGRAM_SHORT_FORM"
-        }
-      ],
-      "transactionAmount": {
-        "transactionAmount": "100",
-        "transactionCurrencyCode": "USD"
-      },
-      "acquirerData": [
-        {
-          "cardBrand" : "mastercard",
-          "acquirerMerchantId" : "SRC3DS",
-          "acquirerBIN": "545301"
-        },
-       {
-        "cardBrand": "visa",
-        "acquirerMerchantId": "33334444",
-        "acquirerBIN": "432104"
-        }
-      ]
-    },
-    "cardBrands": [ // required
-        "mastercard",
-        "maestro",
-        "visa",
-        "amex",
-        "discover"
-    ],
-}
-); // This is calling Mastercard’s init()
-        
+      const button = document.getElementById("checkout-button");
+              initializeMastercardCheckoutServices()
       });
-    });
-  </script>
+</script>
+Back
+
 
 </body>
 </html>
