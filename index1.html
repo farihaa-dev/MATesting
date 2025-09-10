@@ -62,19 +62,22 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
     const AMOUNT = '100.00';
 
     async function initClickToPay() {
-      if (!window.click2pay) {
+      if (!window.mcCheckoutServices) {
         throw new Error('ClickToPay SDK not loaded. Check script URL.');
       }
       // Some setups use dpaId; others srcInitiatorId. Use the one assigned to you.
       const initOptions = {
-        dpaId: DPA_ID,
-        dpaTransactionId: crypto.randomUUID(), // a unique ID per transaction
-        cardBrands: ['mastercard', 'visa', 'amex', 'discover'],
-        countryCode: MERCHANT_COUNTRY,
-        displayMode: 'native' // or 'lightbox' depending on your UX
+          srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",
+            dpaData: {
+                dpaName: "DPA Name"
+            },
+            dpaTransactionOptions: {
+                dpaLocale: "en_US"
+            },
+            cardBrands: ["mastercard"]
       };
       log('Calling click2pay.init', initOptions);
-      await window.click2pay.init(initOptions);
+      await window.mcCheckoutServices.init(initOptions);
       log('ClickToPay.init done');
     }
 
@@ -90,7 +93,7 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
 
         // 1) Check if consumer is recognized
         log('Calling SRC.isRecognized', { email });
-        const recognized = await window.click2pay.isRecognized({
+        const recognized = await window.mcCheckoutServices.isRecognized({
           consumer: { emailAddress: email }
         });
         log('isRecognized response', recognized);
@@ -98,7 +101,7 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
         // 2) If not recognized, identify consumer (may send OTP/password)
         if (!recognized || recognized.consumerRecognized !== true) {
           log('Calling click2pay.identify');
-          await window.click2pay.identify({
+          await window.mcCheckoutServices.identify({
             consumer: { emailAddress: email }
           });
           log('SRC.identify done');
@@ -106,13 +109,13 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
 
         // 3) Start checkout flow. You can let SDK prompt card selection.
         const paymentRequest = {
-          amount: AMOUNT,
-          currencyCode: CURRENCY,
-          countryCode: MERCHANT_COUNTRY
+          amount: '100.00',
+          currencyCode: 'AUD',
+          countryCode: 'AU'
         };
 
         log('Calling SRC.checkout', paymentRequest);
-        const result = await window.click2pay.checkout({
+        const result = await window.mcCheckoutServices.checkout({
           windowRef: window,     // or a popup; SDK decides the UI
           paymentRequest
         });
