@@ -61,7 +61,7 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
     const CURRENCY = 'AUD';
     const AMOUNT = '100.00';
 
-    async function initClickToPay() {
+ /**   async function initClickToPay() {
       if (!window.mcCheckoutServices) {
         throw new Error('ClickToPay SDK not loaded. Check script URL.');
       }
@@ -75,13 +75,14 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
                 dpaLocale: "en_US"
             },
             cardBrands: ["mastercard"]
-      };
+      }; 
       log('Calling click2pay.init', initOptions);
       await window.mcCheckoutServices.init(initOptions);
-      log('ClickToPay.init done');
+      log('ClickToPay.init done');**/
+      init(initOptions);
     }
 
-    async function runClickToPay() {
+ /*   async function runClickToPay() {
       try {
         await initClickToPay();
 
@@ -89,7 +90,7 @@ src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js">
         if (!email) {
           alert('Enter a sandbox consumer email that has Click to Pay set up.');
           return;
-        }
+        }*/
 
         // 1) Check if consumer is recognized
         log('Calling SRC.isRecognized', { email });
