@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  
     <meta charset="UTF-8">
     <title>My First Button</title>
 
-  <!-- Adding Content Security Policy 
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://sandbox.src.mastercard.com; object-src 'none'; base-uri 'self';">
-  -->
+    <!-- Adding Content Security Policy -->
+    <!--
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://sandbox.src.mastercard.com; object-src 'none'; base-uri 'self';">
+    -->
 
-  <!--Adding required scripts for SRC Button-->
-  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
-<link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
+    <!-- Adding required scripts for SRC Button -->
+    <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+    <link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
 
-  <!-- Adding JS -->
-  <script src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
-
-
+    <!-- Adding JS -->
+    <script src="https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"></script>
 </head>
 <body>
 
@@ -25,43 +22,34 @@
 
     <src-button id="checkout-btn"></src-button>
 
-  
-  <script>
+    <script>
+        var params = {
+            srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",
+            dpaData: {
+                dpaName: "DPA Name"
+            },
+            dpaTransactionOptions: {
+                dpaLocale: "en_US"
+            },
+            cardBrands: ["mastercard"]
+        };
 
-     var params = {
-    srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e", // required DPA Identifier, generated during registration.
-    dpaData: {
-     dpaName: "DPA Name"       //required
-    },
-    dpaTransactionOptions: {
-     dpaLocale: "en_US",      // required
-    },
-    cardBrands: ["mastercard"]  // required. Array of card brands supported.
-  }
-  var mcCheckoutService = new MastercardCheckoutServices()
+        var mcCheckoutService = new MastercardCheckoutServices();
 
-  async function initializeMastercardCheckoutServices() {
-    try {
-     var result = await mcCheckoutService.init(params)     
-     // handle result: an object containing a list of initialized card networks
-     // upon successful resolution, other methods, e.g. getCards(), may be called
-    } 
-     catch (error) {
-      // handle error
-     }
-  }
+        async function initializeMastercardCheckoutServices() {
+            try {
+                var result = await mcCheckoutService.init(params);
+                // handle result
+            } catch (error) {
+                // handle error
+                console.error(error);
+            }
+        }
 
-
-checkoutButton.addEventListener("click", function () {        
-  //Check if the Mastercard SDK's init() function is available 
-  initializeMastercardCheckoutServices();
-  
-  }
-
-    
-
-  </script>
-
+        document.getElementById("checkout-btn").addEventListener("click", function () {
+            initializeMastercardCheckoutServices();
+        });
+    </script>
 
 </body>
 </html>
