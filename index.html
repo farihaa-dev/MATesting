@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
 </head>
 <body>
-  <iframe src="index.html" allow="accelerometer" hidden></iframe>
+  <iframe src="index.html" allow="accelerometer" style="display: none;"></iframe>
   <h1>Mastercard Click to Pay Demo</h1>
   <!-- Mastercard SRC Button -->
   <src-button id="payBtn" locale="en_AU"></src-button>
@@ -170,16 +170,10 @@
     }
 
     function showOrderReview(card) {
-      /*document.getElementById('cardList').innerHTML = "";
+      document.getElementById('cardList').innerHTML = "";
       document.getElementById('cardEntry').style.display = 'none';
       document.getElementById('orderReview').style.display = 'block';
-      document.getElementById('orderSummary').textContent = JSON.stringify(card, null, 2);*/
-      const html = `
-      <p>Order Summary:</p>
-      <p>Stripe Press Book 1 - $50</p>
-      <p>Stripe Press Book 2 - $50</p>
-      <p><strong>Total: $100</strong></p>`;
-      document.getElementById('orderSummary').innerHTML = html;
+      document.getElementById('orderSummary').textContent = JSON.stringify("Book 1: $40", "Book 2: $30", "Total: $70");
     }
 
     function showSuccess() {
