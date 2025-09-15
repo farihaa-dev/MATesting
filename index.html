@@ -70,7 +70,7 @@
 
       try {
         const authRes = await mcCheckoutService.authenticate({
-          windowRef: window,
+          windowRef: window.open(),
           //accountReference: {emailAddress: email},
           accountReference: {
               consumerIdentity: {
