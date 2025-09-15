@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mastercard Click-to-Pay – Quick start</title>
+
+  <!-- 1. Mastercard libraries -->
+  <script src="https://sandbox.src.mastercard.com/srci/integration/2/lib.js?srcDpaId=576094b8-e60d-48c7-babe-0a1e0611b37e&locale=en_AU"></script>
+
+  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+  <link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
+  
+  <style>
+    body{font-family:sans-serif;margin:2rem}
+    #log{margin-top:1rem;white-space:pre-wrap;font-family:monospace;background:#f6f8fa;padding:1rem;border:1px solid #ddd}
+  </style>
+</head>
+
+<body>
+  <h1>Click to Pay demo</h1>
+
+  <!-- 2. SRC button -->
+  <src-button id="payBtn" locale="en_AU"></src-button>
+
+  <!-- 3. Debug area -->
+  <div id="log"></div>
+
+  <script>
+    /****************  STEP 2 — init()  ****************/
+    const initParams = {
+      srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",
+      dpaData:   { dpaName: "Fariha Click2Pay Test" },
+      dpaTransactionOptions: { dpaLocale: "en_AU" },
+      cardBrands: ["mastercard"]
+    };
+
+    // Capture a reference we can also expose on window
+    const mcCheckoutService = new MastercardCheckoutServices();
+    window.mcCheckoutService = mcCheckoutService;   // STEP 3 requirement
+
+    async function initSdk () {
+      try {
+        const res = await mcCheckoutService.init(initParams);
+        log("SDK initialised:\n" + JSON.stringify(res, null, 2));
+      } catch (err) {
+        log("init() error: " + err);
+      }
+    }
+
+    /****************  STEP 4 — getCards()  ****************/
+    async function onPayBtnClick () {
+      try {
+        const cards = await mcCheckoutService.getCards();
+        if (cards && cards.length) {
+          log("Cards returned:\n" + JSON.stringify(cards, null, 2));
+          // → Continue to show card picker, encryptCard(), checkoutWithNewCard(), …
+        } else {
+          log("No cards — calling authenticate() …");
+          await authenticateFlow();
+        }
+      } catch (err) {
+        log("getCards() error: " + err);
+      }
+    }
+
+    /****************  STEP 5 — authenticate()  ****************/
+    async function authenticateFlow () {
+      const email = prompt("Enter your email to continue with Click to Pay");
+      if (!email) return;
+
+      try {
+        const authRes = await mcCheckoutService.authenticate({
+          windowRef: window,
+          accountReference: {emailAddress: email},
+          requestRecognitionToken: true
+        });
+        log("authenticate() response:\n" + JSON.stringify(authRes, null, 2));
+        // If cards === [], continue to enrollment → encryptCard() …
+      } catch (err) {
+        log("authenticate() error: " + err);
+      }
+    }
+
+    /****************  Utils  ****************/
+    function log(msg){ document.getElementById("log").textContent = msg; }
+
+    // Initialise on page load
+    initSdk();
+
+    // Wire button click
+    document.getElementById("payBtn").addEventListener("click", onPayBtnClick);
+  </script>
+</body>
+</html>
