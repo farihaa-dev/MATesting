@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mastercard SRC Demo</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 4rem; }
+    #payBtn { padding: 0.8rem 2rem; font-size: 1rem; }
+  </style>
+
+</head>
+<body>
+
+  <button id="payBtn">Pay with Mastercard</button>
+
+  <script>
+    /*****************************************************************
+     * GLOBALS & COMMON HELPERS
+     *****************************************************************/
+    const params = {
+      srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",          // Required DPA ID
+      dpaData: {
+        dpaName: "Fariha SRC Test"                                      // Required DPA display name
+      },
+      dpaTransactionOptions: {
+        dpaLocale: "en_AU"                                       // Required
+      },
+      cardBrands: ["mastercard"]                                 // Supported brands
+    };
+
+    // Mastercard namespace – made global on window by the SDK
+    let mcCheckoutService;
+
+    /*****************************************************************
+     * STEP 1 – Init on button click
+     *****************************************************************/
+    async function initMastercardCheckout() {
+      try {
+        // Create the service object only once
+        if (!mcCheckoutService) {
+          mcCheckoutService = new MastercardCheckoutServices();
+          const result = await mcCheckoutService.init(params);
+          console.log("Init successful:", result);
+        }
+        return true;
+      } catch (err) {
+        console.error("Init failed:", err);
+        alert("Unable to initialize Mastercard Checkout Services");
+        return false;
+      }
+    }
+
+    /*****************************************************************
+     * STEP 2 & STEP 3 – Call checkoutWithCard via window.mcCheckoutServices
+     *****************************************************************/
+    async function startCheckout() {
+      // Ensure we have run init()
+      const ready = await initMastercardCheckout();
+      if (!ready) return;
+
+      // a) Create a centered pop-up window and save the windowRef
+      const width  = 420,
+            height = 600,
+            left   = (window.screen.width  - width)  / 2,
+            top    = (window.screen.height - height) / 2;
+
+      const windowRef = window.open(
+        "",                             // URL is set by the SDK
+        "mcSRCWindow",
+        `popup=yes,width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      // b) Build checkoutWithCard() request
+      const requestPayload = {
+        srcDigitalCardId: "5186001700008785",             // Replace with shopper’s card token
+        windowRef,                                              // Pass the pop-up
+        // Optional fields … add only what you need:
+        dpaTransactionOptions: {
+          dpaLocale: "en_AU",
+          merchantCountryCode: "AU",
+          transactionAmount: {
+            value: 1000,     // cents for USD
+            currency: "AUD"
+          }
+        },
+        rememberMe: true
+      };
+
+      try {
+        const response = await window.mcCheckoutServices.checkoutWithCard(requestPayload);
+        console.log("Checkout response:", response);
+
+        if (response.checkoutActionCode === "SUCCESS") {
+          alert("Payment successful!");
+        } else {
+          alert("Payment cancelled or failed.");
+        }
+      } catch (err) {
+        console.error("checkoutWithCard error:", err);
+        alert("An error occurred during checkout.");
+      }
+    }
+
+    /*****************************************************************
+     * UI – bind button
+     *****************************************************************/
+    document.getElementById("payBtn").addEventListener("click", startCheckout);
+  </script>
+</body>
+</html>
+
