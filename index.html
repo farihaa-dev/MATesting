@@ -173,12 +173,12 @@
       document.getElementById('cardEntry').style.display = 'none';
       document.getElementById('orderReview').style.display = 'block';
       document.getElementById('orderSummary').textContent = JSON.stringify(card, null, 2);*/
-      const html = '
+      const html = `
       <p>Order Summary:</p>
       <p>Stripe Press Book 1 - $50</p>
       <p>Stripe Press Book 2 - $50</p>
-      <p><strong>Total: $100</strong></p>';
-      document.getElementById('orderContainer').innerHTML = html;
+      <p><strong>Total: $100</strong></p>`;
+      document.getElementById('orderSummary').innerHTML = html;
     }
 
     function showSuccess() {
