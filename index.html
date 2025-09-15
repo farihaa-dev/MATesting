@@ -1,100 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mastercard Click-to-Pay – Quick start</title>
-
-  <!-- 1. Mastercard libraries -->
-  <script src="https://sandbox.src.mastercard.com/srci/integration/2/lib.js?srcDpaId=576094b8-e60d-48c7-babe-0a1e0611b37e&locale=en_AU"></script>
-
-  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+  <meta charset="UTF-8">
+  <title>Mastercard SRC Integration Demo</title>
+  <!-- Mastercard SRC UI Kit CSS -->
   <link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
-  
-  <style>
-    body{font-family:sans-serif;margin:2rem}
-    #log{margin-top:1rem;white-space:pre-wrap;font-family:monospace;background:#f6f8fa;padding:1rem;border:1px solid #ddd}
-  </style>
 </head>
-
 <body>
-  <h1>Click to Pay demo</h1>
-
-  <!-- 2. SRC button -->
+  <h1>Mastercard Click to Pay Demo</h1>
+  <!-- Mastercard SRC Button -->
   <src-button id="payBtn" locale="en_AU"></src-button>
 
-  <!-- 3. Debug area -->
-  <div id="log"></div>
+  <div id="cardList" style="margin-top:20px;"></div>
+  <div id="emailPopup" style="display:none;">
+    <label for="emailInput">Enter your email:</label>
+    <input type="email" id="emailInput" />
+    <button id="authBtn">Authenticate</button>
+  </div>
+  <div id="cardEntry" style="display:none;">
+    <h3>Enter Card Details</h3>
+    <input type="text" id="pan" placeholder="Card Number" /><br/>
+    <input type="text" id="expMonth" placeholder="MM" maxlength="2" size="2"/>
+    <input type="text" id="expYear" placeholder="YY" maxlength="4" size="4"/><br/>
+    <input type="text" id="cvc" placeholder="CVC" maxlength="4" size="4"/><br/>
+    <button id="encryptBtn">Encrypt Card</button>
+  </div>
+  <div id="orderReview" style="display:none;">
+    <h3>Order Review</h3>
+    <pre id="orderSummary"></pre>
+    <button id="placeOrderBtn">Place Order</button>
+  </div>
+  <div id="successMsg" style="display:none;">
+    <h2>Order Successful!</h2>
+  </div>
+
+  <!-- Mastercard SRC JS SDK -->
+  <script src="https://sandbox.src.mastercard.com/srci/integration/2/lib.js?srcDpaId=576094b8-e60d-48c7-babe-0a1e0611b37e&locale=en_AU"></script>
+  <script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
 
   <script>
-    /****************  STEP 2 — init()  ****************/
-    const initParams = {
+    // Step 2: Init MastercardCheckoutServices
+    const params = {
       srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",
-      dpaData:   { dpaName: "Fariha Click2Pay Test" },
+      dpaData: { dpaName: "Fariha Click2Pay Test" },
       dpaTransactionOptions: { dpaLocale: "en_AU" },
       cardBrands: ["mastercard"]
     };
+    let mcCheckoutService;
+    let encryptedCardData = null;
+    let selectedCardBrand = null;
+    let checkoutResponse = null;
 
-    // Capture a reference we can also expose on window
-    const mcCheckoutService = new MastercardCheckoutServices();
-    window.mcCheckoutService = mcCheckoutService;   // STEP 3 requirement
-
-    async function initSdk () {
+    async function initializeMastercardCheckoutServices() {
+      mcCheckoutService = new MastercardCheckoutServices();
       try {
-        const res = await mcCheckoutService.init(initParams);
-        log("SDK initialised:\n" + JSON.stringify(res, null, 2));
-      } catch (err) {
-        log("init() error: " + err);
+        await mcCheckoutService.init(params);
+        window.mcCheckoutService = mcCheckoutService; // Make available globally
+      } catch (error) {
+        alert("Init error: " + error);
       }
     }
 
-    /****************  STEP 4 — getCards()  ****************/
-    async function onPayBtnClick () {
+    // Step 4: Get Cards
+    async function getCardsHandler() {
       try {
-        const cards = await mcCheckoutService.getCards();
-        if (cards && cards.length) {
-          log("Cards returned:\n" + JSON.stringify(cards, null, 2));
-          // → Continue to show card picker, encryptCard(), checkoutWithNewCard(), …
+        const cards = await window.mcCheckoutService.getCards();
+        if (cards && cards.length > 0) {
+          showCardList(cards);
         } else {
-          log("No cards — calling authenticate() …");
-          await authenticateFlow();
+          showEmailPopup();
         }
-      } catch (err) {
-        log("getCards() error: " + err);
+      } catch (e) {
+        showEmailPopup();
       }
     }
 
-    /****************  STEP 5 — authenticate()  ****************/
-    async function authenticateFlow () {
-      const email = prompt("Enter your email to continue with Click to Pay");
-      if (!email) return;
-
+    // Step 5: Authenticate with email
+    async function authenticateHandler() {
+      const email = document.getElementById('emailInput').value;
       try {
-        const authRes = await mcCheckoutService.authenticate({
-          windowRef: window.open(),
-          //accountReference: {emailAddress: email},
-          accountReference: {
-              consumerIdentity: {
+        const result = await window.mcCheckoutService.authenticate({
+          windowRef: window,
+          requestRecognitionToken: true,
+          accountReference: { 
+            consumerIdentity: {
                 identityType: "EMAIL_ADDRESS",
-                identityValue: email
-              }
-        },
-          requestRecognitionToken: true
+                identityValue: email                }
+            }
         });
-        log("authenticate() response:\n" + JSON.stringify(authRes, null, 2));
-        // If cards === [], continue to enrollment → encryptCard() …
-      } catch (err) {
-        log("authenticate() error: " + err);
+        if (result.cards && result.cards.length > 0) {
+          showCardList(result.cards);
+        } else {
+          showCardEntry();
+        }
+      } catch (e) {
+        alert("Authentication failed" + e);
       }
     }
 
-    /****************  Utils  ****************/
-    function log(msg){ document.getElementById("log").textContent = msg; }
+    // Step 7: Encrypt Card
+    async function encryptCardHandler() {
+      const pan = document.getElementById('pan').value;
+      const expMonth = document.getElementById('expMonth').value;
+      const expYear = document.getElementById('expYear').value;
+      const cvc = document.getElementById('cvc').value;
+      try {
+        alert("Encrypting card..." + pan + " " + expMonth + " " + expYear + " " + cvc);
+        const result = await window.mcCheckoutService.encryptCard({
+          primaryAccountNumber: pan,
+          panExpirationMonth: expMonth,
+          panExpirationYear: expYear,
+          cardSecurityCode: cvc
+        });
+        encryptedCardData = result.encryptedCard;
+        selectedCardBrand = result.cardBrand;
+        showOrderReview({pan, expMonth, expYear, cardBrand: selectedCardBrand});
+      } catch (e) {
+        alert("Encryption failed." + e);
+      }
+    }
 
-    // Initialise on page load
-    initSdk();
+    // Step 9: Checkout with New Card
+    async function placeOrderHandler() {
+      try {
+        alert("Placing order..." + encryptedCardData + " " + selectedCardBrand);
+        const result = await window.mcCheckoutService.checkoutWithNewCard({
+          encryptedCard: encryptedCardData,
+          cardBrand: selectedCardBrand,
+          windowRef: window,
+          dpaTransactionOptions: { dpaLocale: "en_AU" },
+          rememberMe: true
+        });
+        checkoutResponse = result;
+        if (result.checkoutActionCode === "COMPLETE") {
+          showSuccess();
+        } else {
+          alert("Checkout failed.");
+        }
+      } catch (e) {
+        alert("Checkout error.");
+      }
+    }
 
-    // Wire button click
-    document.getElementById("payBtn").addEventListener("click", onPayBtnClick);
+    // UI Helpers
+    function showCardList(cards) {
+      document.getElementById('emailPopup').style.display = 'none';
+      document.getElementById('cardEntry').style.display = 'none';
+      const cardListDiv = document.getElementById('cardList');
+      cardListDiv.innerHTML = "<h3>Select a Card</h3>";
+      cards.forEach(card => {
+        const btn = document.createElement('button');
+        btn.textContent = `**** **** **** ${card.panLastFour} (${card.digitalCardData.descriptorName})`;
+        btn.onclick = () => showOrderReview(card);
+        cardListDiv.appendChild(btn);
+        cardListDiv.appendChild(document.createElement('br'));
+      });
+    }
+
+    function showEmailPopup() {
+      document.getElementById('cardList').innerHTML = "";
+      document.getElementById('emailPopup').style.display = 'block';
+      document.getElementById('cardEntry').style.display = 'none';
+    }
+
+    function showCardEntry() {
+      document.getElementById('emailPopup').style.display = 'none';
+      document.getElementById('cardEntry').style.display = 'block';
+    }
+
+    function showOrderReview(card) {
+      /*document.getElementById('cardList').innerHTML = "";
+      document.getElementById('cardEntry').style.display = 'none';
+      document.getElementById('orderReview').style.display = 'block';
+      document.getElementById('orderSummary').textContent = JSON.stringify(card, null, 2);*/
+      const html = '
+      <p>Order Summary:</p>
+      <p>Stripe Press Book 1 - $50</p>
+      <p>Stripe Press Book 2 - $50</p>
+      <p><strong>Total: $100</strong></p>';
+      document.getElementById('orderContainer').innerHTML = html;
+    }
+
+    function showSuccess() {
+      document.getElementById('orderReview').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    }
+
+    // Event Listeners
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initializeMastercardCheckoutServices();
+      document.getElementById('payBtn').addEventListener('click', getCardsHandler);
+      document.getElementById('authBtn').addEventListener('click', authenticateHandler);
+      document.getElementById('encryptBtn').addEventListener('click', encryptCardHandler);
+      document.getElementById('placeOrderBtn').addEventListener('click', placeOrderHandler);
+    });
   </script>
 </body>
 </html>
