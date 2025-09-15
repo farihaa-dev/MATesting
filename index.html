@@ -17,6 +17,15 @@
 <body>
 
   <!--<button id="payBtn">Pay with Mastercard</button> -->
+
+  <div class="field">
+    <input id="emailInput" type="email" placeholder="Email address" required />
+  </div>
+  <div class="field">
+    <input id="phoneInput" type="tel" placeholder="Mobile phone number" required />
+  </div>
+
+  
   <src-button id="payBtn" locale="en_AU"></src-button>
 
   <script>
@@ -36,6 +45,7 @@
 
     // Mastercard namespace – made global on window by the SDK
     let mcCheckoutService;
+    let cachedDigitalCardId = "";
 
     /*****************************************************************
      * STEP 1 – Init on button click
