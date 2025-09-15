@@ -10,10 +10,14 @@
 
 <script src="https://sandbox.src.mastercard.com/srci/integration/2/lib.js?srcDpaId=576094b8-e60d-48c7-babe-0a1e0611b37e&locale=en_AU"> </script>
 
+<script type="module" src="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.esm.js"></script>
+<link rel="stylesheet" href="https://src.mastercard.com/srci/integration/components/src-ui-kit/src-ui-kit.css">
+  
 </head>
 <body>
 
-  <button id="payBtn">Pay with Mastercard</button>
+  <!--<button id="payBtn">Pay with Mastercard</button> -->
+  <src-button id="payBtn" locale="en_AU"></src-button>
 
   <script>
     /*****************************************************************
@@ -22,7 +26,7 @@
     const params = {
       srcDpaId: "576094b8-e60d-48c7-babe-0a1e0611b37e",          // Required DPA ID
       dpaData: {
-        dpaName: "Fariha SRC Test"                                      // Required DPA display name
+        dpaName: "Fariha Click2Pay Test"                                      // Required DPA display name
       },
       dpaTransactionOptions: {
         dpaLocale: "en_AU"                                       // Required
