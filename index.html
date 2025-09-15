@@ -57,45 +57,81 @@
     }
 
     /*****************************************************************
-     * STEP 2 & STEP 3 – Call checkoutWithCard via window.mcCheckoutServices
+     * Fetch cards (STEP 2a)
+     *****************************************************************/
+    async function getCardsHandler() {
+      try {
+        const payload = await window.mcCheckoutService.getCards();
+        console.log("getCards payload:", payload);
+
+        /* Example payload structure:
+           {
+             totalCount: 1,
+             cards: [
+               {
+                 srcDigitalCardId: "123-abc-…",
+                 cardLastFour: "7777",
+                 …other fields
+               }
+             ]
+           }
+        */
+
+        if (payload?.cards?.length) {
+          // Pick the first card, or implement your own selection logic
+          cachedDigitalCardId = payload.cards[0].srcDigitalCardId;
+        } else {
+          throw new Error("No cards returned for this shopper.");
+        }
+        return true;
+      } catch (err) {
+        console.error("getCards error:", err);
+        alert("Could not retrieve stored cards.");
+        return false;
+      }
+    }
+
+    /*****************************************************************
+     * STEP 3 – Launch checkoutWithCard()
      *****************************************************************/
     async function startCheckout() {
-      // Ensure we have run init()
-      const ready = await initMastercardCheckout();
-      if (!ready) return;
+      // 1) Make sure SDK is ready
+      if (!(await initMastercardCheckout())) return;
 
-      // a) Create a centered pop-up window and save the windowRef
-      const width  = 420,
+      // 2) Fetch card(s) to obtain srcDigitalCardId
+      if (!(await getCardsHandler())) return;
+
+      // 3) Open centred pop-up window that the SDK will use
+      const width = 420,
             height = 600,
-            left   = (window.screen.width  - width)  / 2,
-            top    = (window.screen.height - height) / 2;
+            left = (screen.width  - width)  / 2,
+            top  = (screen.height - height) / 2;
 
       const windowRef = window.open(
-        "",                             // URL is set by the SDK
-        "mcSRCWindow",
+        "", "mcSRCWindow",
         `popup=yes,width=${width},height=${height},left=${left},top=${top}`
       );
 
-      // b) Build checkoutWithCard() request
+      // 4) Build request payload
       const requestPayload = {
-        srcDigitalCardId: "5186001700008785",             // Replace with shopper’s card token
-        windowRef,                                              // Pass the pop-up
-        // Optional fields … add only what you need:
+        srcDigitalCardId: cachedDigitalCardId,
+        windowRef,
         dpaTransactionOptions: {
-          dpaLocale: "en_AU",
-          merchantCountryCode: "AU",
+          dpaLocale: "en_US",
           transactionAmount: {
-            value: 1000,     // cents for USD
-            currency: "AUD"
-          }
+            value: 1000,          // cents for USD – change if needed
+            currency: "USD"
+          },
+          merchantCountryCode: "US"
         },
         rememberMe: true
       };
 
       try {
-        const response = await window.mcCheckoutServices.checkoutWithCard(requestPayload);
-        console.log("Checkout response:", response);
+        const response =
+          await window.mcCheckoutService.checkoutWithCard(requestPayload);
 
+        console.log("checkoutWithCard response:", response);
         if (response.checkoutActionCode === "SUCCESS") {
           alert("Payment successful!");
         } else {
@@ -103,14 +139,17 @@
         }
       } catch (err) {
         console.error("checkoutWithCard error:", err);
-        alert("An error occurred during checkout.");
+        alert("Checkout failed. See console for details.");
       }
     }
 
     /*****************************************************************
-     * UI – bind button
+     * Hook button click
      *****************************************************************/
-    document.getElementById("payBtn").addEventListener("click", startCheckout);
+    document
+      .getElementById("payBtn")
+      .addEventListener("click", startCheckout);
+
   </script>
 </body>
 </html>
