@@ -173,7 +173,7 @@
       document.getElementById('cardList').innerHTML = "";
       document.getElementById('cardEntry').style.display = 'none';
       document.getElementById('orderReview').style.display = 'block';
-      document.getElementById('orderSummary').textContent = JSON.stringify("Book 1: $40", "Book 2: $30", "Total: $70");
+      document.getElementById('orderSummary').textContent = JSON.stringify(card, null, 2);
     }
 
     function showSuccess() {
